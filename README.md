@@ -1,0 +1,2 @@
+# novabot
+şirketle özel bot 
