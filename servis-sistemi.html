@@ -696,8 +696,27 @@ async function kayitEkle() {
 async function durumGuncelle(takip_no, d) {
   try {
     await sb(`kayitlar?takip_no=eq.${takip_no}&isletme_id=eq.${kullanici.id}`, { method: 'PATCH', body: JSON.stringify({ durum: d }) });
-    bildir('✅ Güncellendi!'); await kayitlariYukle();
+    bildir('✅ Güncellendi!');
+    // Durum hazır veya teslim olunca otomatik WhatsApp sor
+    const kayit = kayitlar.find(k => k.takip_no === takip_no);
+    if (kayit && kayit.tel && (d === 'hazir' || d === 'teslim')) {
+      const mesajlar = {
+        hazir: `Merhaba ${kayit.musteri}, ${kayit.urun} cihazınız hazır! Teslim almak için gelebilirsiniz. Takip No: ${takip_no} — ${kullanici.isletme_adi}`,
+        teslim: `Merhaba ${kayit.musteri}, ${kayit.urun} cihazınız teslim edilmiştir. İyi günler! — ${kullanici.isletme_adi}`
+      };
+      if (confirm('Müşteriye WhatsApp gönderilsin mi?')) {
+        whatsappGonder(kayit.tel, takip_no, kayit.urun, d, mesajlar[d]);
+      }
+    }
+    await kayitlariYukle();
   } catch (e) { bildir('❌ Hata!'); }
+}
+
+function whatsappGonder(tel, takip_no, urun, durum, mesaj) {
+  const temizTel = tel.replace(/\D/g, '').replace(/^0/, '90');
+  const varsayilanMesaj = mesaj || `Merhaba! ${urun} cihazınızın durumu: ${durum}. Takip No: ${takip_no} — ${kullanici.isletme_adi}`;
+  const url = `https://wa.me/${temizTel}?text=${encodeURIComponent(varsayilanMesaj)}`;
+  window.open(url, '_blank');
 }
 
 async function kayitSil(takip_no) {
@@ -736,7 +755,10 @@ function tabloGuncelle(liste) {
     </select></td>
     <td>${k.tarih ? new Date(k.tarih).toLocaleDateString('tr-TR') : '—'}</td>
     <td>${k.ucret ? '₺' + k.ucret : '—'}</td>
-    <td><button class="kucuk-btn" onclick="kayitSil('${k.takip_no}')">Sil</button></td>
+    <td style="display:flex;gap:6px;">
+      ${k.tel ? `<button class="kucuk-btn" style="background:rgba(0,168,132,0.15);color:#00c48c;border-color:#00c48c;" onclick="whatsappGonder('${k.tel}','${k.takip_no}','${k.urun}','${k.durum}')">📲 WA</button>` : ''}
+      <button class="kucuk-btn" onclick="kayitSil('${k.takip_no}')">Sil</button>
+    </td>
   </tr>`).join('');
 }
 
