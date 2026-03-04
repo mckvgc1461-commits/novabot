@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mckvgc1461-commits.github.io/novabot/sitemap.xml
