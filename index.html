@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA Bot — İşletmenize AI Satış Asistanı</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --dark: #0c0c0e;
+    --dark2: #141416;
+    --dark3: #1c1c20;
+    --text: #e8e6e0;
+    --muted: #7a7870;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 40px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--gold);
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 8vw, 88px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    animation: fadeDown 0.8s 0.1s ease both;
+  }
+
+  h1 span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    font-weight: 300;
+    animation: fadeDown 0.8s 0.2s ease both;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeDown 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: #0c0c0e;
+    padding: 16px 36px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 30px rgba(201,168,76,0.3);
+  }
+
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(201,168,76,0.4);
+  }
+
+  .btn-secondary {
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text);
+    padding: 16px 36px;
+    border-radius: 4px;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(201,168,76,0.4);
+    color: var(--gold);
+  }
+
+  /* STATS */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin: 0;
+    background: var(--dark2);
+  }
+
+  .stat {
+    flex: 1;
+    max-width: 200px;
+    padding: 40px 24px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* PROBLEM */
+  .section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 100px 24px;
+  }
+
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .section-title span { color: var(--gold); font-style: italic; }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.8;
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  /* PROBLEMS GRID */
+  .problems {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+    margin-top: 60px;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .problem-card {
+    background: var(--dark2);
+    padding: 36px 32px;
+    transition: background 0.3s;
+  }
+
+  .problem-card:hover { background: var(--dark3); }
+
+  .problem-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .problem-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .problem-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* HOW IT WORKS */
+  .how-bg {
+    background: var(--dark2);
+    padding: 100px 0;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    margin-top: 60px;
+  }
+
+  .step {
+    text-align: center;
+    position: relative;
+  }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: rgba(201,168,76,0.12);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .step-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .pricing-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 40px 32px;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .pricing-card:hover {
+    border-color: rgba(201,168,76,0.3);
+    transform: translateY(-4px);
+  }
+
+  .pricing-card.featured {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), transparent);
+  }
+
+  .featured-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: #0c0c0e;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 16px;
+    border-radius: 20px;
+  }
+
+  .plan-name {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .plan-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .plan-price span {
+    font-size: 18px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  .plan-period {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 32px;
+  }
+
+  .plan-features li {
+    font-size: 14px;
+    color: var(--text);
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .plan-features li::before {
+    content: '✓';
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .btn-plan {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-plan-primary {
+    background: var(--gold);
+    color: #0c0c0e;
+  }
+
+  .btn-plan-primary:hover {
+    background: var(--gold-light);
+  }
+
+  .btn-plan-outline {
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text);
+    background: transparent;
+  }
+
+  .btn-plan-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* TESTIMONIALS */
+  .testimonials {
+    background: var(--dark2);
+    padding: 100px 0;
+  }
+
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .testimonial-card {
+    background: var(--dark);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 32px;
+  }
+
+  .testimonial-stars {
+    color: var(--gold);
+    font-size: 14px;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+
+  .testimonial-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .testimonial-role {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 120px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .cta-title span { color: var(--gold); font-style: italic; }
+
+  .cta-sub {
+    color: var(--muted);
+    font-size: 17px;
+    margin-bottom: 48px;
+    font-weight: 300;
+    position: relative;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  footer strong { color: var(--gold); }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    .stats { flex-wrap: wrap; }
+    .stat { min-width: 50%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .hero-btns { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge"><span class="badge-dot"></span> Yapay Zeka Destekli</div>
+  <h1>İşletmenizde<br><span>7/24 Satış</span><br>Asistanı</h1>
+  <p class="hero-sub">Müşterileriniz soru sorarken siz uyuyun. NOVA Bot, işletmenizi hiç durmadan tanıtır, ikna eder ve satışa yönlendirir.</p>
+  <div class="hero-btns">
+    <a href="#nasil-calisir" class="btn-primary">Hemen Dene →</a>
+    <a href="#nasil-calisir" class="btn-secondary">Nasıl Çalışır?</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <span class="stat-num">7/24</span>
+    <span class="stat-label">Kesintisiz Hizmet</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">%40</span>
+    <span class="stat-label">Daha Fazla Satış</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">3 dk</span>
+    <span class="stat-label">Kurulum Süresi</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">₺0</span>
+    <span class="stat-label">Teknik Bilgi Gerektirmez</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section reveal">
+  <span class="section-tag">Sorun</span>
+  <h2 class="section-title">Müşteriler soru sorar,<br><span>siz cevap veremezsiniz</span></h2>
+  <p class="section-desc">Her gün onlarca potansiyel müşteri işletmenizi bulur, soru sorar ve cevap alamadığı için rakibinize gider. Bu para sizin cebinizden çıkıyor.</p>
+
+  <div class="problems">
+    <div class="problem-card">
+      <span class="problem-icon">😴</span>
+      <div class="problem-title">Gece soruları cevapsız kalıyor</div>
+      <p class="problem-text">Gece 11'de ürününüzü görmek isteyen müşteri sabaha kadar beklemek zorunda kalıyor.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">📵</span>
+      <div class="problem-title">Telefon her zaman açık değil</div>
+      <p class="problem-text">Meşgul olduğunuzda kaçan aramalar, kaçan müşteriler demektir.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">🔄</span>
+      <div class="problem-title">Aynı soruları tekrar tekrar yanıtlıyorsunuz</div>
+      <p class="problem-text">"Fiyat nedir?", "Kargo kaç gün?", "İade var mı?" — hep aynı sorular, hep sizin zamanınız.</p>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">💸</span>
+      <div class="problem-title">Rakipler müşterilerinizi alıyor</div>
+      <p class="problem-text">Hızlı cevap veren rakipleriniz, sizin potansiyel müşterilerinizi kapıyor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-bg" id="nasil-calisir">
+  <div class="section reveal">
+    <span class="section-tag">Çözüm</span>
+    <h2 class="section-title">3 adımda <span>hazır</span></h2>
+    <p class="section-desc">Teknik bilgi gerekmez. Bir WhatsApp mesajı kadar kolay.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Ürünlerinizi Anlatın</div>
+        <p class="step-text">Bize ürünlerinizi, fiyatlarınızı ve işletmenizi kısaca anlatın. Sadece birkaç dakika sürer.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Bot Hazırlanır</div>
+        <p class="step-text">NOVA Bot, işletmenize özel olarak ayarlanır ve test edilir. Aynı gün teslim.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Yayına Alın</div>
+        <p class="step-text">Web sitenize veya sosyal medyanıza ekleyin. Müşterileriniz hemen kullanmaya başlar.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Kazanmaya Bakın</div>
+        <p class="step-text">Siz işinizle ilgilenirken NOVA Bot müşterileri karşılar, ikna eder, satışa yönlendirir.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- TESTIMONIALS -->
+<div class="testimonials">
+  <div class="section reveal">
+    <span class="section-tag">Referanslar</span>
+    <h2 class="section-title">İşletmeler <span>ne diyor?</span></h2>
+
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Gece gelen müşteri sorularını artık kaçırmıyorum. Sabah kalkıyorum, bot zaten her şeyi halletmiş."</p>
+        <div class="testimonial-author">Ahmet K.</div>
+        <div class="testimonial-role">Elektronik Mağazası Sahibi</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Fiyat sorusu, kargo sorusu, iade sorusu — hepsine bot cevap veriyor. Ben sadece siparişlere bakıyorum."</p>
+        <div class="testimonial-author">Fatma S.</div>
+        <div class="testimonial-role">Butik İşletmecisi</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Müşteriler botun yapay zeka olduğunu bile fark etmiyor. Çok doğal konuşuyor."</p>
+        <div class="testimonial-author">Murat D.</div>
+        <div class="testimonial-role">Oto Aksesuar Dükkanı</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT FORM -->
+<section class="cta-section reveal" id="iletisim">
+  <h2 class="cta-title">Hemen <span>iletişime geç</span></h2>
+  <p class="cta-sub">Formu doldur, sana 1 saat içinde dönelim.</p>
+
+  <div style="max-width:480px; margin:0 auto; position:relative;">
+    <div id="form-box" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:40px; text-align:left;">
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#c9a84c; display:block; margin-bottom:8px;">Adınız</label>
+        <input id="f-name" type="text" placeholder="Örn: Ahmet Yılmaz" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:14px 16px; color:#e8e6e0; font-size:15px; outline:none; font-family:inherit; box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#c9a84c; display:block; margin-bottom:8px;">Telefon / WhatsApp</label>
+        <input id="f-phone" type="tel" placeholder="05XX XXX XX XX" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:14px 16px; color:#e8e6e0; font-size:15px; outline:none; font-family:inherit; box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:28px;">
+        <label style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#c9a84c; display:block; margin-bottom:8px;">İşletmeniz / Mesajınız</label>
+        <textarea id="f-msg" rows="3" placeholder="Örn: Telefon tamircisiyim, demo görmek istiyorum" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:14px 16px; color:#e8e6e0; font-size:15px; outline:none; font-family:inherit; resize:none; box-sizing:border-box;"></textarea>
+      </div>
+      <button onclick="sendForm()" style="width:100%; background:#c9a84c; color:#0c0c0e; border:none; border-radius:6px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:1px;">
+        WhatsApp'tan Gönder →
+      </button>
+      <p style="font-size:12px; color:#7a7870; text-align:center; margin-top:12px;">Bilgileriniz sadece sizinle iletişim için kullanılır.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+function sendForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const msg = document.getElementById('f-msg').value.trim();
+
+  if (!name || !phone) {
+    alert('Lütfen adınızı ve telefon numaranızı girin.');
+    return;
+  }
+
+  const text = `Merhaba! NOVA Bot hakkında bilgi almak istiyorum.%0AAd: ${encodeURIComponent(name)}%0ATelefon: ${encodeURIComponent(phone)}%0AMesaj: ${encodeURIComponent(msg || 'Demo görmek istiyorum')}`;
+  window.open(`https://wa.me/905379868928?text=${text}`, '_blank');
+}
+</script>
+
+<!-- FOOTER -->
+<footer>
+  <strong>NOVA Bot</strong> — Yapay Zeka Destekli Satış Asistanı<br>
+  <span style="margin-top:8px; display:inline-block;">Ereğli, Zonguldak · <a href="#iletisim" onclick="document.getElementById('iletisim').scrollIntoView({behavior:'smooth'}); return false;" style="color:var(--gold); text-decoration:none;">WhatsApp ile ulaş</a></span>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
